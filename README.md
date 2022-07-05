@@ -48,7 +48,7 @@ Dataset used: [COCO2017](<https://cocodataset.org/>)
 
 # Environment Requirements
 
-- Hardware（Ascend/GPU）
+- Hardware（GPU）
 
     - Prepare hardware environment with Ascend processor.
 
@@ -105,25 +105,7 @@ Note:
 2. pretrained model is a resnet50 checkpoint that trained over ImageNet2012.you can train it with [resnet50](https://gitee.com/mindspore/models/tree/master/official/cv/resnet) scripts in modelzoo, and use src/convert_checkpoint.py to get the pretrain model.
 3. BACKBONE_MODEL is a checkpoint file trained with [resnet50](https://gitee.com/mindspore/models/tree/master/official/cv/resnet) scripts in modelzoo.PRETRAINED_MODEL is a checkpoint file after convert.VALIDATION_JSON_FILE is label file. CHECKPOINT_PATH is a checkpoint file after trained.
 
-## Run on Ascend
 
-```shell
-
-# convert checkpoint
-python -m src.convert_checkpoint --ckpt_file=[BACKBONE_MODEL]
-
-# standalone training
-bash run_standalone_train_ascend.sh [PRETRAINED_MODEL] [BACKBONE] [COCO_ROOT] [MINDRECORD_DIR](optional)
-
-# distributed training
-bash run_distribute_train_ascend.sh [RANK_TABLE_FILE] [PRETRAINED_MODEL] [BACKBONE] [COCO_ROOT] [MINDRECORD_DIR](optional)
-
-# eval
-bash run_eval_ascend.sh [VALIDATION_JSON_FILE] [CHECKPOINT_PATH] [BACKBONE] [COCO_ROOT] [MINDRECORD_DIR](optional)
-
-# inference (the values of IMAGE_WIDTH and IMAGE_HEIGHT must be set or use default at the same time.)
-bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANN_FILE_PATH] [IMAGE_WIDTH](optional) [IMAGE_HEIGHT](optional) [DEVICE_ID](optional)
-```
 
 ## Run on GPU
 
@@ -175,115 +157,7 @@ bash run_distribute_train_ascend.sh [RANK_TABLE_FILE] [PRETRAINED_MODEL] [BACKBO
 bash run_eval_ascend.sh [VALIDATION_JSON_FILE] [CHECKPOINT_PATH] [BACKBONE] [COCO_ROOT] [MINDRECORD_DIR](optional)
 ```
 
-5. Inference
 
-```shell
-# inference
-bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANN_FILE] [IMAGE_WIDTH](optional) [IMAGE_HEIGHT](optional) [DEVICE_ID](optional)
-```
-
-- Running on [ModelArts](https://support.huaweicloud.com/modelarts/)
-
-    ```bash
-    # Train 8p with Ascend
-    # (1) Perform a or b.
-    #       a. Set "enable_modelarts=True" on default_config.yaml file.
-    #          Set "distribute=True" on default_config.yaml file.
-    #          Set "data_path='/cache/data'" on default_config.yaml file.
-    #          Set "epoch_size: 20" on default_config.yaml file.
-    #          (optional)Set "checkpoint_url='s3://dir_to_your_pretrained/'" on default_config.yaml file.
-    #          Set other parameters on default_config.yaml file you need.
-    #       b. Add "enable_modelarts=True" on the website UI interface.
-    #          Add "distribute=True" on the website UI interface.
-    #          Add "data_path=/cache/data" on the website UI interface.
-    #          Add "epoch_size: 20" on the website UI interface.
-    #          (optional)Add "checkpoint_url='s3://dir_to_your_pretrained/'" on the website UI interface.
-    #          Add other parameters on the website UI interface.
-    # (2) Prepare model code
-    # (3) Upload or copy your pretrained model to S3 bucket if you want to finetune.
-    # (4) Perform a or b. (suggested option a)
-    #       a. First, zip MindRecord dataset to one zip file.
-    #          Second, upload your zip dataset to S3 bucket.(you could also upload the origin mindrecord dataset, but it can be so slow.)
-    #       b. Upload the original dataset to S3 bucket.
-    #           (Data set conversion occurs during training process and costs a lot of time. it happens every time you train.)
-    # (5) Set the code directory to "/path/faster_rcnn" on the website UI interface.
-    # (6) Set the startup file to "train.py" on the website UI interface.
-    # (7) Set the "Dataset path" and "Output file path" and "Job log path" to your path on the website UI interface.
-    # (8) Create your job.
-    #
-    # Train 1p with Ascend
-    # (1) Perform a or b.
-    #       a. Set "enable_modelarts=True" on default_config.yaml file.
-    #          Set "data_path='/cache/data'" on default_config.yaml file.
-    #          Set "epoch_size: 20" on default_config.yaml file.
-    #          (optional)Set "checkpoint_url='s3://dir_to_your_pretrained/'" on default_config.yaml file.
-    #          Set other parameters on default_config.yaml file you need.
-    #       b. Add "enable_modelarts=True" on the website UI interface.
-    #          Add "data_path='/cache/data'" on the website UI interface.
-    #          Add "epoch_size: 20" on the website UI interface.
-    #          (optional)Add "checkpoint_url='s3://dir_to_your_pretrained/'" on the website UI interface.
-    #          Add other parameters on the website UI interface.
-    # (2) Prepare model code
-    # (3) Upload or copy your pretrained model to S3 bucket if you want to finetune.
-    # (4) Perform a or b. (suggested option a)
-    #       a. zip MindRecord dataset to one zip file.
-    #          Second, upload your zip dataset to S3 bucket.(you could also upload the origin mindrecord dataset, but it can be so slow.)
-    #       b. Upload the original dataset to S3 bucket.
-    #           (Data set conversion occurs during training process and costs a lot of time. it happens every time you train.)
-    # (5) Set the code directory to "/path/faster_rcnn" on the website UI interface.
-    # (6) Set the startup file to "train.py" on the website UI interface.
-    # (7) Set the "Dataset path" and "Output file path" and "Job log path" to your path on the website UI interface.
-    # (8) Create your job.
-    #
-    # Eval 1p with Ascend
-    # (1) Perform a or b.
-    #       a. Set "enable_modelarts=True" on default_config.yaml file.
-    #          Set "checkpoint_url='s3://dir_to_your_trained_model/'" on base_config.yaml file.
-    #          Set "checkpoint='./faster_rcnn/faster_rcnn_trained.ckpt'" on default_config.yaml file.
-    #          Set "data_path='/cache/data'" on default_config.yaml file.
-    #          Set other parameters on default_config.yaml file you need.
-    #       b. Add "enable_modelarts=True" on the website UI interface.
-    #          Add "checkpoint_url='s3://dir_to_your_trained_model/'" on the website UI interface.
-    #          Add "checkpoint='./faster_rcnn/faster_rcnn_trained.ckpt'" on the website UI interface.
-    #          Add "data_path='/cache/data'" on the website UI interface.
-    #          Add other parameters on the website UI interface.
-    # (2) Prepare model code
-    # (3) Upload or copy your trained model to S3 bucket.
-    # (4) Perform a or b. (suggested option a)
-    #       a. First, zip MindRecord dataset to one zip file.
-    #          Second, upload your zip dataset to S3 bucket.(you could also upload the origin mindrecord dataset, but it can be so slow.)
-    #       b. Upload the original dataset to S3 bucket.
-    #           (Data set conversion occurs during training process and costs a lot of time. it happens every time you train.)
-    # (5) Set the code directory to "/path/faster_rcnn" on the website UI interface.
-    # (6) Set the startup file to "eval.py" on the website UI interface.
-    # (7) Set the "Dataset path" and "Output file path" and "Job log path" to your path on the website UI interface.
-    # (8) Create your job.
-    ```
-
-- Export on ModelArts (If you want to run in modelarts, please check the official documentation of [modelarts](https://support.huaweicloud.com/modelarts/), and you can start evaluating as follows)
-
-1. Export s8 multiscale and flip with voc val dataset on modelarts, evaluating steps are as follows:
-
-    ```python
-    # (1) Perform a or b.
-    #       a. Set "enable_modelarts=True" on base_config.yaml file.
-    #          Set "file_name='faster_rcnn'" on base_config.yaml file.
-    #          Set "file_format='MINDIR'" on base_config.yaml file.
-    #          Set "checkpoint_url='/The path of checkpoint in S3/'" on beta_config.yaml file.
-    #          Set "ckpt_file='/cache/checkpoint_path/model.ckpt'" on base_config.yaml file.
-    #          Set other parameters on base_config.yaml file you need.
-    #       b. Add "enable_modelarts=True" on the website UI interface.
-    #          Add "file_name='faster_rcnn'" on the website UI interface.
-    #          Add "file_format='MINDIR'" on the website UI interface.
-    #          Add "checkpoint_url='/The path of checkpoint in S3/'" on the website UI interface.
-    #          Add "ckpt_file='/cache/checkpoint_path/model.ckpt'" on the website UI interface.
-    #          Add other parameters on the website UI interface.
-    # (2) Upload or copy your trained model to S3 bucket.
-    # (3) Set the code directory to "/path/faster_rcnn" on the website UI interface.
-    # (4) Set the startup file to "export.py" on the website UI interface.
-    # (5) Set the "Dataset path" and "Output file path" and "Job log path" to your path on the website UI interface.
-    # (6) Create your job.
-    ```
 
 # Script Description
 
@@ -356,15 +230,7 @@ elif backbone == "resnet_v1_50":
 
 ### Usage
 
-#### on Ascend
 
-```shell
-# standalone training on ascend
-bash run_standalone_train_ascend.sh [PRETRAINED_MODEL] [BACKBONE] [COCO_ROOT] [MINDRECORD_DIR](optional)
-
-# distributed training on ascend
-bash run_distribute_train_ascend.sh [RANK_TABLE_FILE] [PRETRAINED_MODEL] [BACKBONE] [COCO_ROOT] [MINDRECORD_DIR](optional)
-```
 
 #### on GPU
 
@@ -428,10 +294,7 @@ epoch: 12 step: 7393, rpn_loss: 0.00691, rcnn_loss: 0.10168, rpn_cls_loss: 0.005
 
 #### on Ascend
 
-```shell
-# eval on ascend
-bash run_eval_ascend.sh [VALIDATION_JSON_FILE] [CHECKPOINT_PATH] [BACKBONE] [COCO_ROOT] [MINDRECORD_DIR](optional)
-```
+
 
 #### on GPU
 
@@ -542,20 +405,20 @@ Inference result is saved in current path, you can find result like this in acc.
 
 #### ResNet-50 backbone
 
-| Parameters                 | Ascend                                                      | GPU                                                 |
-| -------------------------- | ----------------------------------------------------------- |---------------------------------------------------- |
-| Model Version              | V1                                                          | V1                                                  |
-| Resource                   | Ascend 910; CPU 2.60GHz, 192cores; Memory 755G; OS Euler2.8 | 8 x RTX3090 24GB                                    |
-| uploaded Date              | 08/31/2020 (month/day/year)                                 | 11/19/2021 (month/day/year)                         |
-| MindSpore Version          | 1.0.0                                                       | 1.3.0                                               |
-| Dataset                    | COCO2017                                                    | COCO2017                                            |
-| Training Parameters        | epoch=12,  batch_size=2                                     | epoch=20,  batch_size=2                             |
-| Optimizer                  | SGD                                                         | SGD                                                 |
-| Loss Function              | Softmax Cross Entropy ,Sigmoid Cross Entropy,SmoothL1Loss   | Softmax Cross Entropy ,Sigmoid Cross Entropy,SmoothL1Loss |
-| Speed                      | 1pc: 190 ms/step;  8pcs: 200 ms/step                        | 1pc: 288 ms/step;  8pcs: 346 ms/step                |
-| Total time                 | 1pc: 37.17 hours;  8pcs: 4.89 hours                         | 1pc: 63.09 hours;  8pcs: 8.25 hours                 |
-| Parameters (M)             | 250                                                         | 250                                                 |
-| Scripts                    | [fasterrcnn script](https://gitee.com/mindspore/models/tree/master/official/cv/faster_rcnn) | [fasterrcnn script](https://gitee.com/mindspore/models/tree/master/official/cv/faster_rcnn) |
+| Parameters                 |  GPU                                                 |
+| -------------------------- | ---------------------------------------------------- |
+| Model Version              |  V1                                                  |
+| Resource                   |  8 x RTX3090 24GB                                    |
+| uploaded Date              |  11/19/2021 (month/day/year)                         |
+| MindSpore Version          | 1.3.0                                               |
+| Dataset                    | COCO2017                                            |
+| Training Parameters        |  epoch=20,  batch_size=2                             |
+| Optimizer                  | SGD                                                 |
+| Loss Function              |  Softmax Cross Entropy ,Sigmoid Cross Entropy,SmoothL1Loss |
+| Speed                      | 1pc: 288 ms/step;  8pcs: 346 ms/step                |
+| Total time                 | 1pc: 63.09 hours;  8pcs: 8.25 hours                 |
+| Parameters (M)             |  250                                                 |
+| Scripts                    | [fasterrcnn script](https://gitee.com/mindspore/models/tree/master/official/cv/faster_rcnn) |
 
 #### ResNet-101 backbone
 
@@ -577,17 +440,17 @@ Inference result is saved in current path, you can find result like this in acc.
 
 #### ResNet-50 backbone
 
-| Parameters          | Ascend                      | GPU                        |
-| ------------------- | --------------------------- |--------------------------- |
-| Model Version       | V1                          | V1                         |
-| Resource            | Ascend 910; OS Euler2.8     | 8 x RTX3090 24GB           |
-| Uploaded Date       | 08/31/2020 (month/day/year) | 11/19/2021 (month/day/year)|
-| MindSpore Version   | 1.0.0                       | 1.3.0                      |
-| Dataset             | COCO2017                    | COCO2017                   |
-| batch_size          | 2                           | 2                          |
-| outputs             | mAP                         | mAP                        |
-| Accuracy            | IoU=0.50: 58.6%             | IoU=0.50: 61.3%            |
-| Model for inference | 250M (.ckpt file)           | 500M (.ckpt file)          |
+| Parameters          |  GPU                        |
+| ------------------- | --------------------------- |
+| Model Version       | V1                         |
+| Resource            |  8 x RTX3090 24GB           |
+| Uploaded Date       | 11/19/2021 (month/day/year)|
+| MindSpore Version   |  1.3.0                      |
+| Dataset             |  COCO2017                   |
+| batch_size          |  2                          |
+| outputs             |  mAP                        |
+| Accuracy            |  IoU=0.50: 61.3%            |
+| Model for inference |  500M (.ckpt file)          |
 
 #### ResNet-101 backbone
 
